@@ -1,4 +1,4 @@
-.PHONY: all clean
+.PHONY: all clean help
 
 VENV_DIR := .venv
 PYTHON := python3
