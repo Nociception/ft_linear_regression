@@ -13,7 +13,7 @@ from srcs.BonusAnimator import BonusAnimator
 
 
 def read_csv_strict(path: Path) -> Tuple[np.ndarray, np.ndarray, str, str]:
-    """Requirements:
+    """CSV Requirements:
       - Exactly two columns
       - All values numeric
     """
@@ -31,12 +31,8 @@ def read_csv_strict(path: Path) -> Tuple[np.ndarray, np.ndarray, str, str]:
     x_col_name, y_col_name = col_names[0], col_names[1]
 
     n_rows = df.height
-    if n_rows < 100_000:
-        data_type = pl.Float64
-        dtype_name = "Float64"
-    else:
-        data_type = pl.Float32
-        dtype_name = "Float32"
+    threshold = 100_000
+    data_type, dtype_name = (pl.Float64, "Float64") if n_rows < threshold else (pl.Float32, "Float32")
     print(f"Data conversion strategy: {dtype_name} (based on {n_rows} rows)")
 
     try:
@@ -58,16 +54,14 @@ def grad_desc_stand(
     y_stand: np.ndarray,
     alpha: float = 0.01,
     n_iter: int = 1000,
+    threshold: float = 1e-6,
 ) -> Tuple[np.ndarray, np.ndarray, List[float]]:
     """Returns the sequences of (a_n, b_n) at each iteration and the standardized cost list."""
     m = float(len(x_stand))
-    theta1 = 0.0
-    theta0 = 0.0
-    threshold = 1e-6
 
-    theta1_stand_seq = []
-    theta0_stand_seq = []
-    cost_stand_seq = []
+    theta1, theta0 = 0.0, 0.0
+
+    theta1_stand_seq, theta0_stand_seq, cost_stand_seq = [], [], []
 
     count = 0
     while count < n_iter and (
@@ -91,8 +85,39 @@ def grad_desc_stand(
     return np.array(theta1_stand_seq), np.array(theta0_stand_seq), cost_stand_seq
 
 
-def metrics_raw(X: np.ndarray, y: np.ndarray, a: float, b: float) -> Dict[str, float]:
-    pred = predict_line(a, b, X)
+def metrics_raw(x: np.ndarray, y: np.ndarray, a: float, b: float) -> Dict[str, float]:
+    """
+    Calculates a set of common regression metrics to evaluate a linear model's performance.
+
+    This function computes the Mean Squared Error (MSE), Mean Absolute Error (MAE),
+    Root Mean Squared Error (RMSE), and the R-squared (R²) score for a simple linear
+    regression model. It compares the predictions of the line defined by the slope `a`
+    and intercept `b` against the true target values `y`.
+
+    Args:
+        x (np.ndarray): The input feature array used for making predictions.
+        y (np.ndarray): The true target values against which the predictions are compared.
+        a (float): The calculated slope (or weight) of the regression line.
+        b (float): The calculated y-intercept (or bias) of the regression line.
+
+    Returns:
+        Dict[str, float]: A dictionary containing the following metrics:
+            - "mse" (Mean Squared Error): The average of the squared differences between
+              the predicted and actual values. It penalizes larger errors more heavily,
+              making it sensitive to outliers.
+            - "mae" (Mean Absolute Error): The average of the absolute differences between
+              the predicted and actual values. It's more robust to outliers than MSE,
+              as it doesn't square the errors.
+            - "rmse" (Root Mean Squared Error): The square root of the MSE. It's a key metric
+              because its units are the same as the target variable `y`, making it
+              easier to interpret and compare with the data's scale.
+            - "r2" (R-squared): The coefficient of determination. This value represents the
+              proportion of the variance in the dependent variable that is predictable
+              from the independent variable. A value close to 1.0 indicates that the model
+              explains a large portion of the variance, while a value near 0.0 suggests
+              the model explains very little.
+    """
+    pred = predict_line(a, b, x)
     mse = cost_mse(pred, y)
     mae = float(np.mean(np.abs(pred - y)))
     rmse = float(np.sqrt(mse))
@@ -176,10 +201,11 @@ def main() -> None:
 
     alpha = 0.01
     n_iter = 600
+    threshold = 1e-6
     print(f"Hyperparameters: learning_rate={alpha}, iterations={n_iter}")
 
     theta1_stand_seq, theta0_stand_seq, cost_stand_seq = grad_desc_stand(
-        x_stand, y_stand, alpha=alpha, n_iter=n_iter
+        x_stand, y_stand, alpha=alpha, n_iter=n_iter, threshold=threshold
     )
 
     theta1_raw_seq, theta0_raw_seq, cost_raw_seq = unstandardize_results(
