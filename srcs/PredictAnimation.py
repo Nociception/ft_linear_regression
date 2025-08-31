@@ -44,7 +44,7 @@ class PredictAnimation:
 
         self.mileage_text = self.ax.text(
             self.mileage,
-            self.ax.get_ylim()[0]-500,
+            self.ax.get_ylim()[0] - 500,
             f"{self.mileage:.0f}",
             ha="center",
             va="bottom",

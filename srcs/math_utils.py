@@ -19,12 +19,17 @@ def predict_line(theta1: float, theta0: float, x: np.ndarray) -> np.ndarray:
 
 
 def unstandardize_params(
-    a_n: float, b_n: float, mean_x: float, std_x: float, mean_y: float, std_y: float
+    theta1_stand: float,
+    theta0_stand: float,
+    mean_x: float,
+    std_x: float,
+    mean_y: float,
+    std_y: float,
 ) -> Tuple[float, float]:
-    """Map standardized params (a_n, b_n) to raw-space (a_r, b_r)."""
-    a_r = a_n * (std_y / std_x)
-    b_r = b_n * std_y + mean_y - a_r * mean_x
-    return float(a_r), float(b_r)
+    """Map standardized params (theta1_stand, theta0_stand) to raw-space (theta1_raw, theta0_raw)."""
+    theta1_raw = theta1_stand * (std_y / std_x)
+    theta0_raw = theta0_stand * std_y + mean_y - theta1_raw * mean_x
+    return float(theta1_raw), float(theta0_raw)
 
 
 def unstandardize_results(

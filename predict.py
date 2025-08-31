@@ -95,9 +95,11 @@ def main():
         print("Error: mileage must be a valid number.", file=sys.stderr)
         sys.exit(1)
 
-    if args. mileage_float < 20_000:
+    if args.mileage_float < 20_000:
         print("Warning: mileage is quite low, prediction may be inaccurate.")
-        print("Remind that the idea is to predict a price for a used car, not a new one.\n")
+        print(
+            "Remind that the idea is to predict a price for a used car, not a new one.\n"
+        )
 
     model_path = args.model
     if not model_path.exists():
@@ -159,7 +161,7 @@ def main():
 
     elif predicted_target == 0 and args.bonus:
         print("\nPrediction is zero, skipping bonus visualization.")
-    
+
     else:
         print("\nBonus mode not enabled. Type:")
         print("\n\tpython3 predict.py <your_mileage> --bonus")

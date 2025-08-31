@@ -14,8 +14,8 @@ from srcs.TrainAnimation import TrainAnimation
 
 def read_csv_strict(path: Path) -> Tuple[np.ndarray, np.ndarray, str, str]:
     """CSV Requirements:
-      - Exactly two columns
-      - All values numeric
+    - Exactly two columns
+    - All values numeric
     """
     if not path.exists():
         raise SystemExit(f"Error: CSV file not found: {path}")
@@ -32,7 +32,9 @@ def read_csv_strict(path: Path) -> Tuple[np.ndarray, np.ndarray, str, str]:
 
     n_rows = df.height
     threshold = 100_000
-    data_type, dtype_name = (pl.Float64, "Float64") if n_rows < threshold else (pl.Float32, "Float32")
+    data_type, dtype_name = (
+        (pl.Float64, "Float64") if n_rows < threshold else (pl.Float32, "Float32")
+    )
     print(f"Data conversion strategy: {dtype_name} (based on {n_rows} rows)")
 
     try:
@@ -59,7 +61,7 @@ def grad_desc_stand(
     """Returns the sequences of (a_n, b_n) at each iteration and the standardized cost list."""
     m = float(len(x_stand))
 
-    theta1, theta0 = 0.0, 0.0
+    theta1_stand, theta0_stand = 0.0, 0.0
 
     theta1_stand_seq, theta0_stand_seq, cost_stand_seq = [], [], []
 
@@ -70,17 +72,17 @@ def grad_desc_stand(
     ):
         count += 1
 
-        estimate_stand = predict_line(theta1, theta0, x_stand)
+        estimate_stand = predict_line(theta1_stand, theta0_stand, x_stand)
         cost_stand = cost_mse(estimate_stand, y_stand)
         cost_stand_seq.append(cost_stand)
 
         tmp_theta0 = alpha * np.sum(estimate_stand - y_stand) / m
-        theta0 -= tmp_theta0
-        theta0_stand_seq.append(theta0)
+        theta0_stand -= tmp_theta0
+        theta0_stand_seq.append(theta0_stand)
 
         tmp_theta1 = alpha * np.sum((estimate_stand - y_stand) * x_stand) / m
-        theta1 -= tmp_theta1
-        theta1_stand_seq.append(theta1)
+        theta1_stand -= tmp_theta1
+        theta1_stand_seq.append(theta1_stand)
 
     return np.array(theta1_stand_seq), np.array(theta0_stand_seq), cost_stand_seq
 
@@ -135,7 +137,12 @@ def model_out_path(csv_path: Path) -> Path:
 
 
 def save_model(
-    x_label: str, y_label: str, path: Path, theta0: float, theta1: float, extra: Dict[str, float]
+    x_label: str,
+    y_label: str,
+    path: Path,
+    theta0: float,
+    theta1: float,
+    extra: Dict[str, float],
 ) -> None:
     try:
         with open(path, "w", encoding="utf-8") as f:
