@@ -7,7 +7,7 @@ from typing import Dict, Tuple
 
 import polars as pl
 
-from srcs.PredictionAnimator import PredictionAnimator
+from srcs.PredictAnimation import PredictAnimation
 
 try:
     from srcs.math_utils import predict_line
@@ -24,7 +24,7 @@ def parse_args() -> argparse.Namespace:
     )
 
     parser.add_argument(
-        "mileage", type=float, help="The mileage to predict the price for."
+        "mileage", type=str, help="The mileage to predict the price for."
     )
     parser.add_argument(
         "--model",
@@ -55,7 +55,7 @@ def parse_args() -> argparse.Namespace:
 
 def read_model_file(path: Path) -> Tuple[str, str, float, float]:
     """Read and parse the model file."""
-    parsed_data: Dict[str, str] = {}
+    parsed_data: Dict[str, str] = dict()
     try:
         with open(path, "r") as f:
             for line in f:
@@ -86,28 +86,38 @@ def read_model_file(path: Path) -> Tuple[str, str, float, float]:
 def main():
     args = parse_args()
 
-    if args.mileage < 0:
-        print("Error: mileage must be a positive number.", file=sys.stderr)
+    try:
+        mileage_float = float(args.mileage)
+        if mileage_float < 0:
+            print("Error: mileage must be a positive number.", file=sys.stderr)
+            sys.exit(1)
+    except ValueError:
+        print("Error: mileage must be a valid number.", file=sys.stderr)
         sys.exit(1)
+
+    if args. mileage_float < 20_000:
+        print("Warning: mileage is quite low, prediction may be inaccurate.")
+        print("Remind that the idea is to predict a price for a used car, not a new one.\n")
 
     model_path = args.model
     if not model_path.exists():
         print(f"Error: Model file '{model_path}' not found.", file=sys.stderr)
         print(
             "It is suggested to run the training program to create the model.txt file, "
-            "with the explicit command: python3 train.py",
+            "with the explicit command:",
             file=sys.stderr,
         )
+        print("\n\tpython3 train.py\n")
         sys.exit(1)
 
     x_label, y_label, theta0, theta1 = read_model_file(model_path)
 
-    predicted_price = predict_line(theta1, theta0, args.mileage)
+    predicted_target = max(0, predict_line(theta1, theta0, mileage_float))
     print(
-        f"The estimated price for a mileage of {int(args.mileage)} ({x_label}) is {predicted_price:.2f} ({y_label})."
+        f"The estimated price for a mileage of {args.mileage} ({x_label}) is {predicted_target:.2f} ({y_label})."
     )
 
-    if args.bonus:
+    if predicted_target > 0 and args.bonus:
         try:
             if args.model.name == "model.txt":
                 data_path = Path("data.csv")
@@ -123,13 +133,12 @@ def main():
                 return
 
             df_data = pl.read_csv(data_path)
-            x_label, y_label = df_data.columns[0], df_data.columns[1]
             x_data = df_data.select(x_label).to_numpy().flatten()
             y_data = df_data.select(y_label).to_numpy().flatten()
 
-            animator = PredictionAnimator(
-                args.mileage,
-                predicted_price,
+            animator = PredictAnimation(
+                mileage_float,
+                predicted_target,
                 x_data,
                 y_data,
                 theta0,
@@ -147,6 +156,13 @@ def main():
         except Exception as e:
             print(f"Error during bonus visualization: {e}", file=sys.stderr)
             sys.exit(1)
+
+    elif predicted_target == 0 and args.bonus:
+        print("\nPrediction is zero, skipping bonus visualization.")
+    
+    else:
+        print("\nBonus mode not enabled. Type:")
+        print("\n\tpython3 predict.py <your_mileage> --bonus")
 
 
 if __name__ == "__main__":

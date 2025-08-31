@@ -6,7 +6,7 @@ from typing import List, Tuple
 from .math_utils import predict_line, cost_mse
 
 
-class BonusAnimator:
+class TrainAnimation:
     def __init__(
         self,
         x_raw: np.ndarray,

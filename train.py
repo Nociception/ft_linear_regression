@@ -9,7 +9,7 @@ import polars as pl
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
 
 from srcs.math_utils import zscore, cost_mse, predict_line, unstandardize_results
-from srcs.BonusAnimator import BonusAnimator
+from srcs.TrainAnimation import TrainAnimation
 
 
 def read_csv_strict(path: Path) -> Tuple[np.ndarray, np.ndarray, str, str]:
@@ -224,9 +224,15 @@ def main() -> None:
     save_model(x_label, y_label, out_path, theta0_raw, theta1_raw, extra)
     print(f"Model saved to: {out_path.resolve()}")
 
+    print("Model performance metrics available in the model file: model.txt")
+
+    print("\nYou now can use the model for predictions.")
+    print("\n\tpython3 predict.py")
+    print("\n(Note: this file also accepts the --bonus flag for visualization.)\n")
+
     if bonus:
         print("Showing synchronized bonus animations… (will play once)")
-        animator = BonusAnimator(
+        animation = TrainAnimation(
             x_raw,
             y_raw,
             x_stand,
@@ -240,7 +246,10 @@ def main() -> None:
             x_label,
             y_label,
         )
-        animator.run()
+        animation.run()
+    else:
+        print("Bonus mode is off. To enable, run with the --bonus flag:")
+        print("\n\tpython3 train.py --bonus\n")
 
 
 if __name__ == "__main__":

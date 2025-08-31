@@ -1,11 +1,11 @@
 import numpy as np
-from typing import Tuple, List
+from typing import Tuple
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from srcs.math_utils import predict_line
 
 
-class PredictionAnimator:
+class PredictAnimation:
     def __init__(
         self,
         mileage: float,
