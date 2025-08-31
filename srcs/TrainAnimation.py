@@ -93,7 +93,7 @@ class TrainAnimation:
         self.ax3d_raw.set_xlabel("theta1")
         self.ax3d_raw.set_ylabel("theta0")
         self.ax3d_raw.set_zlabel("Cost (MSE)")
-        A_r, B_r, C_r = self._build_cost_surface(
+        A_r, B_r, C_r = self.build_cost_surface(
             self.x_raw,
             self.y_raw,
             self.theta1_raw_seq,
@@ -115,7 +115,7 @@ class TrainAnimation:
         self.ax3d_n.set_xlabel("theta1")
         self.ax3d_n.set_ylabel("theta0")
         self.ax3d_n.set_zlabel("Cost (MSE)")
-        A_n, B_n, C_n = self._build_cost_surface(
+        A_n, B_n, C_n = self.build_cost_surface(
             self.x_stand,
             self.y_stand,
             self.theta1_stand_seq,
@@ -132,7 +132,7 @@ class TrainAnimation:
             [], [], [], s=12, color=self.orange_color
         )
 
-    def _build_cost_surface(
+    def build_cost_surface(
         self,
         X: np.ndarray,
         y: np.ndarray,
@@ -163,7 +163,7 @@ class TrainAnimation:
         C = np.mean(err**2, axis=0)
         return A, B, C
 
-    def _update(self, frame: int):
+    def update(self, frame: int):
         a_r = self.theta1_raw_seq[frame]
         b_r = self.theta0_raw_seq[frame]
         y_line = predict_line(
@@ -218,8 +218,8 @@ class TrainAnimation:
 
     def run(self):
         anim = FuncAnimation(
-            self.fig,
-            self._update,
+            fig=self.fig,
+            func=self.update,
             frames=self.n_frames,
             interval=1,
             repeat=False,
