@@ -2,6 +2,7 @@
 
 VENV_DIR := .venv
 PYTHON := python3
+MAIN_FILE := train.py
 
 all:
 	@if [ ! -d "$(VENV_DIR)" ]; then \
@@ -20,7 +21,7 @@ all:
 			pip install -r requirements.txt ; \
 			echo "\n=============================================="; \
 			echo "Dependencies installed. You can now run your script:"; \
-			echo "\n\t$(PYTHON) train.py\n"; \
+			echo "\n\t$(PYTHON) $(MAIN_FILE)\n"; \
 			echo "(Do not hesitate to try the --bonus option)"; \
 			echo "=============================================="; \
 		else \
@@ -41,6 +42,10 @@ clean:
 		if [ "$$ans" = "y" ] || [ -z "$$ans" ]; then \
 			rm -rf $(VENV_DIR); \
 			echo "Virtual environment removed."; \
+			echo "Note: You may also want to deactivate the virtual environment if it's active."; \
+			echo "To do so, run:\n" ; \
+			echo "\t'deactivate'\n" ; \
+			echo "in your shell."; \
 		else \
 			echo "Operation cancelled."; \
 		fi; \
