@@ -227,8 +227,10 @@ def main() -> None:
     print("Model performance metrics available in the model file: model.txt")
 
     print("\nYou now can use the model for predictions.")
-    print("\n\tpython3 predict.py")
-    print("\n(Note: this file also accepts the --bonus flag for visualization.)\n")
+    print("\n\tpython3 predict.py <mileage>\n")
+    print("\n(Notes:")
+    print("- <mileage> should be a numeric value.")
+    print("- this file also accepts the --bonus flag for visualization.)\n")
 
     if bonus:
         print("Showing synchronized bonus animations… (will play once)")

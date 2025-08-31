@@ -52,3 +52,21 @@ clean:
 	else \
 		echo "Virtual environment '$(VENV_DIR)' does not exist. Nothing to remove."; \
 	fi
+
+help:
+	@echo "Makefile for managing the project's Python environment and scripts."
+	@echo ""
+	@echo "Usage:"
+	@echo "  make all      - Creates the virtual environment if it doesn't exist, and"
+	@echo "                  installs project dependencies if the environment is active."
+	@echo "  make clean    - Deletes the virtual environment with a confirmation prompt."
+	@echo "  make help     - Displays this help message."
+	@echo ""
+	@echo "Scripts:"
+	@echo "  The 'train.py' script must be run before 'predict.py'."
+	@echo "  Both have a '--help' option for more details, and a --bonus option for visualisation."
+	@echo "  1. Train your model by running 'python3 train.py'."
+	@echo "     - This creates the 'model.txt' file."
+	@echo ""
+	@echo "  2. Use the trained model to predict a car's price with 'predict.py'."
+	@echo "     - Run 'python3 predict.py <mileage>' to get a price prediction."
