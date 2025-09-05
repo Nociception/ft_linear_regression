@@ -95,7 +95,7 @@ def main():
         print("Error: mileage must be a valid number.", file=sys.stderr)
         sys.exit(1)
 
-    if args.mileage_float < 20_000:
+    if mileage_float < 20_000:
         print("Warning: mileage is quite low, prediction may be inaccurate.")
         print(
             "Remind that the idea is to predict a price for a used car, not a new one.\n"
