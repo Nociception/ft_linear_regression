@@ -1,13 +1,12 @@
 from __future__ import annotations
+from srcs.env_check import ensure_env
+ensure_env()
 from typing import Dict, Tuple, List
-
 import argparse
 from pathlib import Path
-
 import numpy as np
 import polars as pl
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
-
 from srcs.math_utils import zscore, cost_mse, predict_line, unstandardize_results
 from srcs.TrainAnimation import TrainAnimation
 

@@ -1,4 +1,6 @@
 from __future__ import annotations
+from srcs.env_check import ensure_env
+ensure_env()
 import sys
 import argparse
 from pathlib import Path
