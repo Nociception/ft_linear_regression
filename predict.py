@@ -1,21 +1,12 @@
 from __future__ import annotations
-
 import sys
 import argparse
 from pathlib import Path
 from typing import Dict, Tuple
-
 import polars as pl
-
 from srcs.PredictAnimation import PredictAnimation
-
-try:
-    from srcs.math_utils import predict_line
-except ImportError:
-    print(
-        "Error: 'srcs/math_utils.py' not found. Please ensure it's in the same directory."
-    )
-    sys.exit(1)
+from srcs.math_utils import predict_line
+from srcs.utils import eprint
 
 
 def parse_args() -> argparse.Namespace:
@@ -77,9 +68,7 @@ def read_model_file(path: Path) -> Tuple[str, str, float, float]:
         return x_label, y_label, float(theta0_str), float(theta1_str)
 
     except (IOError, ValueError, IndexError) as e:
-        print(
-            f"Error: Could not read or parse model file '{path}'. {e}", file=sys.stderr
-        )
+        eprint(f"Error: Could not read or parse model file '{path}'. {e}")
         sys.exit(1)
 
 
@@ -89,10 +78,10 @@ def main():
     try:
         mileage_float = float(args.mileage)
         if mileage_float < 0:
-            print("Error: mileage must be a positive number.", file=sys.stderr)
+            eprint("Error: mileage must be a positive number.")
             sys.exit(1)
     except ValueError:
-        print("Error: mileage must be a valid number.", file=sys.stderr)
+        eprint("Error: mileage must be a valid number.")
         sys.exit(1)
 
     if mileage_float < 20_000:
@@ -102,17 +91,19 @@ def main():
         )
 
     model_path = args.model
-    if not model_path.exists():
-        print(f"Error: Model file '{model_path}' not found.", file=sys.stderr)
-        print(
+    if model_path.exists():
+        model_read = True
+        x_label, y_label, theta0, theta1 = read_model_file(model_path)
+    else:
+        model_read = False
+        eprint(f"Error: Model file '{model_path}' not found.\n"
             "It is suggested to run the training program to create the model.txt file, "
-            "with the explicit command:",
-            file=sys.stderr,
+            "with the explicit command:\n"
+                "\n\tpython3 train.py\n\n"
+            "Otherwise, parameters theta0 and theta1 are set to 0 by default.\n"
         )
-        print("\n\tpython3 train.py\n")
-        sys.exit(1)
-
-    x_label, y_label, theta0, theta1 = read_model_file(model_path)
+        x_label, y_label, theta0, theta1 = "feature", "target", 0.0, 0.0
+        
 
     predicted_target = max(0, predict_line(theta1, theta0, mileage_float))
     print(
@@ -128,10 +119,7 @@ def main():
                 data_path = args.model.parent / f"{data_stem}.csv"
 
             if not data_path.exists():
-                print(
-                    f"Warning: Data file '{data_path}' not found. Cannot plot bonus graph.",
-                    file=sys.stderr,
-                )
+                eprint(f"Warning: Data file '{data_path}' not found. Cannot plot bonus graph.")
                 return
 
             df_data = pl.read_csv(data_path)
@@ -151,20 +139,18 @@ def main():
             animator.run()
 
         except pl.ColumnNotFoundError:
-            print(
-                f"Error: Columns not found in data file '{data_path}'.", file=sys.stderr
-            )
+            eprint(f"Error: Columns not found in data file '{data_path}'.")
             sys.exit(1)
         except Exception as e:
-            print(f"Error during bonus visualization: {e}", file=sys.stderr)
+            print(f"Error during bonus visualization: {e}")
             sys.exit(1)
 
     elif predicted_target == 0 and args.bonus:
         print("\nPrediction is zero, skipping bonus visualization.")
 
-    else:
-        print("\nBonus mode not enabled. Type:")
-        print("\n\tpython3 predict.py <your_mileage> --bonus")
+    elif model_read and not args.bonus:
+        print("\nBonus mode not enabled. Type:"
+              "\n\n\tpython3 predict.py <your_mileage> --bonus\n\n")
 
 
 if __name__ == "__main__":
