@@ -36,6 +36,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Show this help message and continue program execution.",
     )
+    parser.add_argument(
+        "--dalton-type",
+        choices=["protanopia", "deuteranopia", "tritanopia"],
+        help="Adjust colors for red-green-blue color deficiencies."
+    )
 
     args = parser.parse_args()
 
@@ -76,6 +81,7 @@ def read_model_file(path: Path) -> Tuple[str, str, float, float]:
 
 def main():
     args = parse_args()
+    dalton_type: bool = args.dalton_type
 
     try:
         mileage_float = float(args.mileage)
@@ -137,6 +143,7 @@ def main():
                 theta1,
                 x_label,
                 y_label,
+                dalton_type=dalton_type
             )
             animator.run()
 

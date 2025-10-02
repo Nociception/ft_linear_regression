@@ -3,6 +3,7 @@ from typing import Tuple
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from srcs.math_utils import predict_line
+from srcs.colors import get_palette
 
 
 class PredictAnimation:
@@ -16,6 +17,7 @@ class PredictAnimation:
         theta1: float,
         x_label: str,
         y_label: str,
+        dalton_type: str | None = None,
     ):
         self.mileage = mileage
         self.predicted_price = predicted_price
@@ -26,6 +28,12 @@ class PredictAnimation:
         self.x_label = x_label
         self.y_label = y_label
         self.n_frames = 100
+
+        self.palette = get_palette(dalton_type)
+        self.blue = self.palette["blue"]
+        self.orange = self.palette["orange"]
+        self.red = self.palette["red"]
+        self.cmap = self.palette["cmap"]
 
         self.fig, self.ax = plt.subplots(figsize=(10, 6))
 

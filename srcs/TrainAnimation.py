@@ -4,6 +4,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.animation import FuncAnimation
 from typing import List, Tuple
 from .math_utils import predict_line, cost_mse
+from srcs.colors import get_palette
 
 
 class TrainAnimation:
@@ -21,6 +22,7 @@ class TrainAnimation:
         cost_raw_seq: List[float],
         x_label: str,
         y_label: str,
+        dalton_type: str | None = None,
     ):
         self.x_raw = x_raw
         self.y_raw = y_raw
@@ -36,8 +38,11 @@ class TrainAnimation:
         self.y_label = y_label
         self.n_frames = len(self.theta1_stand_seq)
 
-        self.blue_color = "blue"
-        self.orange_color = "orange"
+        self.palette = get_palette(dalton_type)
+        self.blue = self.palette["blue"]
+        self.orange = self.palette["orange"]
+        self.red = self.palette["red"]
+        self.cmap = self.palette["cmap"]
 
         self.fig = plt.figure(figsize=(14, 6))
 
@@ -46,13 +51,13 @@ class TrainAnimation:
         ax_norm_rect = [0.6, 0.05, 0.35, 0.4]
 
         self.ax_main = self.fig.add_axes(ax_main_rect)
-        self.ax_main.set_xlabel(self.x_label, color=self.blue_color)
-        self.ax_main.set_ylabel(self.y_label, color=self.blue_color)
-        self.ax_main.tick_params(axis="x", colors=self.blue_color)
-        self.ax_main.tick_params(axis="y", colors=self.blue_color)
+        self.ax_main.set_xlabel(self.x_label, color=self.blue)
+        self.ax_main.set_ylabel(self.y_label, color=self.blue)
+        self.ax_main.tick_params(axis="x", colors=self.blue)
+        self.ax_main.tick_params(axis="y", colors=self.blue)
 
         self.ax_main.scatter(
-            self.x_raw, self.y_raw, s=16, alpha=0.9, label="data", color=self.blue_color
+            self.x_raw, self.y_raw, s=16, alpha=0.9, label="data", color=self.blue
         )
         x_line = np.array([np.min(self.x_raw), np.max(self.x_raw)])
         (self.line_reg,) = self.ax_main.plot(
@@ -60,7 +65,7 @@ class TrainAnimation:
             predict_line(self.theta1_raw_seq[0], self.theta0_raw_seq[0], x_line),
             lw=2,
             label="model",
-            color="red",
+            color=self.red,
         )
         self.ax_main.legend(loc="best")
 
@@ -73,11 +78,11 @@ class TrainAnimation:
 
         self.ax_overlay.ticklabel_format(style="plain", axis="y", useOffset=False)
 
-        self.ax_overlay.set_xlabel("Iteration", color=self.orange_color)
-        self.ax_overlay.set_ylabel("Cost (MSE) - RAW data", color=self.orange_color)
+        self.ax_overlay.set_xlabel("Iteration", color=self.orange)
+        self.ax_overlay.set_ylabel("Cost (MSE) - RAW data", color=self.orange)
 
-        self.ax_overlay.tick_params(axis="x", colors=self.orange_color)
-        self.ax_overlay.tick_params(axis="y", colors=self.orange_color)
+        self.ax_overlay.tick_params(axis="x", colors=self.orange)
+        self.ax_overlay.tick_params(axis="y", colors=self.orange)
         self.ax_overlay.set_xlim(1, self.n_frames)
         cmin = float(np.min(self.cost_raw_seq))
         cmax = float(np.max(self.cost_raw_seq))
@@ -85,7 +90,7 @@ class TrainAnimation:
         self.ax_overlay.set_ylim(cmin - cmarg, cmax + cmarg)
         self.iters = np.arange(1, self.n_frames + 1)
         self.cost_scatter = self.ax_overlay.scatter(
-            [], [], s=4, color=self.orange_color
+            [], [], s=4, color=self.orange
         )
 
         self.ax3d_raw = self.fig.add_axes(ax_raw_rect, projection="3d")
@@ -101,13 +106,13 @@ class TrainAnimation:
             use_gd_path=True,
         )
         self.ax3d_raw.plot_surface(
-            A_r, B_r, C_r, cmap="viridis", alpha=0.6, linewidth=0, antialiased=True
+            A_r, B_r, C_r, cmap=self.cmap, alpha=0.6, linewidth=0, antialiased=True
         )
         self.traj_r_x: List[float] = []
         self.traj_r_y: List[float] = []
         self.traj_r_z: List[float] = []
         self.traj_r_scatter = self.ax3d_raw.scatter(
-            [], [], [], s=12, color=self.orange_color
+            [], [], [], s=12, color=self.orange
         )
 
         self.ax3d_n = self.fig.add_axes(ax_norm_rect, projection="3d")
@@ -123,13 +128,13 @@ class TrainAnimation:
             use_gd_path=False,
         )
         self.ax3d_n.plot_surface(
-            A_n, B_n, C_n, cmap="viridis", alpha=0.6, linewidth=0, antialiased=True
+            A_n, B_n, C_n, cmap=self.cmap, alpha=0.6, linewidth=0, antialiased=True
         )
         self.traj_n_x: List[float] = []
         self.traj_n_y: List[float] = []
         self.traj_n_z: List[float] = []
         self.traj_n_scatter = self.ax3d_n.scatter(
-            [], [], [], s=12, color=self.orange_color
+            [], [], [], s=12, color=self.orange
         )
 
     def build_cost_surface(
@@ -189,7 +194,7 @@ class TrainAnimation:
                 [self.traj_r_z[frame - 1], cz],
                 linestyle="--",
                 linewidth=1,
-                color=self.orange_color,
+                color=self.orange,
             )
 
         tn1 = float(self.theta1_stand_seq[frame])
@@ -206,7 +211,7 @@ class TrainAnimation:
                 [self.traj_n_z[-2], self.traj_n_z[-1]],
                 linestyle="--",
                 linewidth=1,
-                color=self.orange_color,
+                color=self.orange,
             )
 
         return (

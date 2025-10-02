@@ -170,18 +170,26 @@ def parsing_cli_args() -> argparse.Namespace:
         action="store_true",
         help="Enable bonus mode to visualize the training process.",
     )
+    parser.add_argument(
+        "--dalton-type",
+        choices=["protanopia", "deuteranopia", "tritanopia"],
+        help="Adjust colors for red-green-blue color deficiencies."
+    )
 
-    args = parser.parse_args()
-    if not args.file.is_absolute():
-        args.file = Path.cwd() / args.file
-    if not args.file.suffix.lower() == ".csv":
-        raise SystemExit("Error: file must be a CSV file (with .csv extension).")
-    if not args.file.exists():
-        raise SystemExit(f"Error: file does not exist: {args.file}")
-    if not args.file.is_file():
-        raise SystemExit(f"Error: path is not a file: {args.file}")
-    if not args.file.stat().st_size > 0:
-        raise SystemExit(f"Error: file is empty: {args.file}")
+    try:
+        args = parser.parse_args()
+        if not args.file.is_absolute():
+            args.file = Path.cwd() / args.file
+        if not args.file.suffix.lower() == ".csv":
+            raise SystemExit("Error: file must be a CSV file (with .csv extension).")
+        if not args.file.exists():
+            raise SystemExit(f"Error: file does not exist: {args.file}")
+        if not args.file.is_file():
+            raise SystemExit(f"Error: path is not a file: {args.file}")
+        if not args.file.stat().st_size > 0:
+            raise SystemExit(f"Error: file is empty: {args.file}")
+    except Exception as e:
+        raise SystemExit(f"Error: failed to parse command line arguments: {e}")
 
     return args
 
@@ -191,6 +199,7 @@ def main() -> None:
 
     csv_path: Path = args.file
     bonus: bool = args.bonus
+    dalton_type: bool = args.dalton_type
 
     print(f"Training file: {csv_path}")
     print(f"Bonus mode: {'ON' if bonus else 'OFF'}")
@@ -253,6 +262,7 @@ def main() -> None:
             cost_raw_seq,
             x_label,
             y_label,
+            dalton_type=dalton_type,
         )
         animation.run()
     else:
