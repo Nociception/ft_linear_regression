@@ -56,10 +56,15 @@ DALTON_PALETTE: Dict[str, Dict[str, Tuple[float, float, float]]] = {
     },
 }
 
-def get_palette(dalton_type: str | None = None) -> Dict[str, Tuple[float, float, float]]:
+
+def get_palette(
+    dalton_type: str | None = None,
+) -> Dict[str, Tuple[float, float, float]]:
     """Returns the palette adapted to the type of color blindness, or the base palette."""
     if dalton_type is None:
         return BASE_PALETTE
     if dalton_type not in DALTON_PALETTE:
-        raise ValueError(f"Unknown dalton_type: {dalton_type}. Choose from {list(DALTON_PALETTE.keys())}")
+        raise ValueError(
+            f"Unknown dalton_type: {dalton_type}. Choose from {list(DALTON_PALETTE.keys())}"
+        )
     return DALTON_PALETTE[dalton_type]

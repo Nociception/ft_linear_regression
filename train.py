@@ -1,5 +1,6 @@
 from __future__ import annotations
 from srcs.env_check import ensure_env
+
 ensure_env()
 from typing import Dict, Tuple, List
 import argparse
@@ -173,7 +174,7 @@ def parsing_cli_args() -> argparse.Namespace:
     parser.add_argument(
         "--dalton-type",
         choices=["protanopia", "deuteranopia", "tritanopia"],
-        help="Adjust colors for red-green-blue color deficiencies."
+        help="Adjust colors for red-green-blue color deficiencies.",
     )
 
     try:

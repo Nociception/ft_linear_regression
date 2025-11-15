@@ -2,6 +2,7 @@ from .utils import eprint
 import os
 import sys
 
+
 def ensure_env():
     EXPECTED = os.path.join(os.getcwd(), ".venv", "bin", "python")
     current = sys.executable

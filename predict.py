@@ -1,5 +1,6 @@
 from __future__ import annotations
 from srcs.env_check import ensure_env
+
 ensure_env()
 import sys
 import argparse
@@ -39,7 +40,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--dalton-type",
         choices=["protanopia", "deuteranopia", "tritanopia"],
-        help="Adjust colors for red-green-blue color deficiencies."
+        help="Adjust colors for red-green-blue color deficiencies.",
     )
 
     args = parser.parse_args()
@@ -104,14 +105,14 @@ def main():
         x_label, y_label, theta0, theta1 = read_model_file(model_path)
     else:
         model_read = False
-        eprint(f"Error: Model file '{model_path}' not found.\n"
+        eprint(
+            f"Error: Model file '{model_path}' not found.\n"
             "It is suggested to run the training program to create the model.txt file, "
             "with the explicit command:\n"
-                "\n\tpython3 train.py\n\n"
+            "\n\tpython3 train.py\n\n"
             "Otherwise, parameters theta0 and theta1 are set to 0 by default.\n"
         )
         x_label, y_label, theta0, theta1 = "feature", "target", 0.0, 0.0
-        
 
     predicted_target = max(0, predict_line(theta1, theta0, mileage_float))
     print(
@@ -127,7 +128,9 @@ def main():
                 data_path = args.model.parent / f"{data_stem}.csv"
 
             if not data_path.exists():
-                eprint(f"Warning: Data file '{data_path}' not found. Cannot plot bonus graph.")
+                eprint(
+                    f"Warning: Data file '{data_path}' not found. Cannot plot bonus graph."
+                )
                 return
 
             df_data = pl.read_csv(data_path)
@@ -143,7 +146,7 @@ def main():
                 theta1,
                 x_label,
                 y_label,
-                dalton_type=dalton_type
+                dalton_type=dalton_type,
             )
             animator.run()
 
@@ -158,8 +161,10 @@ def main():
         print("\nPrediction is zero, skipping bonus visualization.")
 
     elif model_read and not args.bonus:
-        print("\nBonus mode not enabled. Try:"
-              "\n\n\t./run.sh predict <your_mileage> --bonus\n\n")
+        print(
+            "\nBonus mode not enabled. Try:"
+            "\n\n\t./run.sh predict <your_mileage> --bonus\n\n"
+        )
 
 
 if __name__ == "__main__":

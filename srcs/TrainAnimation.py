@@ -89,9 +89,7 @@ class TrainAnimation:
         cmarg = 0.05 * (cmax - cmin if cmax > cmin else max(cmax, 1.0))
         self.ax_overlay.set_ylim(cmin - cmarg, cmax + cmarg)
         self.iters = np.arange(1, self.n_frames + 1)
-        self.cost_scatter = self.ax_overlay.scatter(
-            [], [], s=4, color=self.orange
-        )
+        self.cost_scatter = self.ax_overlay.scatter([], [], s=4, color=self.orange)
 
         self.ax3d_raw = self.fig.add_axes(ax_raw_rect, projection="3d")
         self.ax3d_raw.set_title("Cost surface - RAW data")
@@ -111,9 +109,7 @@ class TrainAnimation:
         self.traj_r_x: List[float] = []
         self.traj_r_y: List[float] = []
         self.traj_r_z: List[float] = []
-        self.traj_r_scatter = self.ax3d_raw.scatter(
-            [], [], [], s=12, color=self.orange
-        )
+        self.traj_r_scatter = self.ax3d_raw.scatter([], [], [], s=12, color=self.orange)
 
         self.ax3d_n = self.fig.add_axes(ax_norm_rect, projection="3d")
         self.ax3d_n.set_title("Cost surface - STANDARDIZED data")
@@ -133,9 +129,7 @@ class TrainAnimation:
         self.traj_n_x: List[float] = []
         self.traj_n_y: List[float] = []
         self.traj_n_z: List[float] = []
-        self.traj_n_scatter = self.ax3d_n.scatter(
-            [], [], [], s=12, color=self.orange
-        )
+        self.traj_n_scatter = self.ax3d_n.scatter([], [], [], s=12, color=self.orange)
 
     def build_cost_surface(
         self,
