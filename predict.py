@@ -158,8 +158,8 @@ def main():
         print("\nPrediction is zero, skipping bonus visualization.")
 
     elif model_read and not args.bonus:
-        print("\nBonus mode not enabled. Type:"
-              "\n\n\tpython3 predict.py <your_mileage> --bonus\n\n")
+        print("\nBonus mode not enabled. Try:"
+              "\n\n\t./run.sh predict <your_mileage> --bonus\n\n")
 
 
 if __name__ == "__main__":
