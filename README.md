@@ -25,28 +25,43 @@ Performance metrics calculation: MSE, MAE, RMSE, and R² are stored in the model
 
 ## Local installation & usage
 
-Clone the repository
+### Clone the repository
+```bash
+git clone git@github.com:Nociception/ft_linear_regression.git
+```
 
-```cd ft_linear_regression```
+```bash
+cd ft_linear_regression
+```
 
 ### First step: train
 
-```./run.sh train```
+```bash
+./run.sh train
+```
 
-or
+or (better !)
 
-```./run.sh train --bonus```
+```bash
+./run.sh train --bonus
+```
 
 You also can input another specific csv file (2 numerical columns) with:
 
-```./run.sh train --bonus --file yourdatafile.csv```
+```bash
+./run.sh train --bonus --file yourdatafile.csv
+```
 
 ### Second step: predict
 
-```./run.sh train 650000```
+```bash
+./run.sh train 650000
+```
 
-or
+or (better again!)
 
-```./run.sh train 65000 --bonus```
+```bash
+./run.sh train 65000 --bonus
+```
 
-(a km value is mandatory)
+(a km value is mandatory, nothing to predict otherwise)
