@@ -224,5 +224,4 @@ class TrainAnimation:
             repeat=False,
             blit=False,
         )
-        anim.save("training.mp4", writer="ffmpeg", fps=30, dpi=150)
         plt.show()
