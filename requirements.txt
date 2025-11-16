@@ -1,3 +1,4 @@
 polars
 matplotlib
 numpy
+streamlit

@@ -1,3 +1,5 @@
+"""Short file to upload the train bonus on Streamlit Cloud"""
+
 import streamlit as st
 
 st.title("Linear Regression Training Animation")
