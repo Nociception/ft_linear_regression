@@ -8,6 +8,7 @@ Try the Streamlit application here: https://ft-linear-regression.streamlit.app/
 ## Introduction
 
 This project is an introduction to machine learning. The main goal is to implement a simple linear regression to predict a car's price based on its mileage using the gradient descent algorithm.
+The idea is to code almost everything from scratch, not to write just a `model = LinearRegression().fit(X, y)` and boom done. The goal is then more to understand maths behind.
 
 ## The project has two main programs:
 
