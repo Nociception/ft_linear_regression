@@ -10,6 +10,8 @@ import polars as pl
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
 from srcs.math_utils import zscore, cost_mse, predict_line, unstandardize_results
 from srcs.TrainAnimation import TrainAnimation
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 
 def read_csv_strict(path: Path) -> Tuple[np.ndarray, np.ndarray, str, str]:
@@ -195,9 +197,8 @@ def parsing_cli_args() -> argparse.Namespace:
     return args
 
 
-def main() -> None:
+def main() -> None | FuncAnimation:
     args = parsing_cli_args()
-
     csv_path: Path = args.file
     bonus: bool = args.bonus
     dalton_type: bool = args.dalton_type
