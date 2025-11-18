@@ -1,17 +1,22 @@
-from __future__ import annotations
-from srcs.env_check import ensure_env
+"""
+This file handles all the calculations for linear regression.
+Bonus is handled with TrainAnimation.py
+"""
 
-ensure_env()
-from typing import Dict, Tuple, List
-import argparse
+from __future__ import annotations
 from pathlib import Path
+from typing import Dict, List, Tuple
+
+import argparse
 import numpy as np
 import polars as pl
-from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
-from srcs.math_utils import zscore, cost_mse, predict_line, unstandardize_results
-from srcs.TrainAnimation import TrainAnimation
-import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+
+from srcs.math_utils import (cost_mse, predict_line, unstandardize_results,
+                             zscore)
+from srcs.TrainAnimation import TrainAnimation
+from srcs.env_check import ensure_env
+ensure_env()
 
 
 def read_csv_strict(path: Path) -> Tuple[np.ndarray, np.ndarray, str, str]:
@@ -60,7 +65,10 @@ def grad_desc_stand(
     n_iter: int = 1000,
     threshold: float = 1e-6,
 ) -> Tuple[np.ndarray, np.ndarray, List[float]]:
-    """Returns the sequences of (a_n, b_n) at each iteration and the standardized cost list."""
+    """
+    Returns the sequences of (a_n, b_n)
+    at each iteration and the standardized cost list.
+    """
     m = float(len(x_stand))
 
     theta1_stand, theta0_stand = 0.0, 0.0
@@ -75,8 +83,7 @@ def grad_desc_stand(
         count += 1
 
         estimate_stand = predict_line(theta1_stand, theta0_stand, x_stand)
-        cost_stand = cost_mse(estimate_stand, y_stand)
-        cost_stand_seq.append(cost_stand)
+        cost_stand_seq.append(cost_mse(estimate_stand, y_stand))
 
         tmp_theta0 = alpha * np.sum(estimate_stand - y_stand) / m
         theta0_stand -= tmp_theta0
@@ -132,33 +139,36 @@ def metrics_raw(x: np.ndarray, y: np.ndarray, a: float, b: float) -> Dict[str, f
 
 
 def model_out_path(csv_path: Path) -> Path:
+    """
+    Generates the output model file path based on the input CSV file path.
+    """
     if csv_path.name.lower() == "data.csv":
         return Path("model.txt")
     stem = csv_path.stem
     return Path(f"{stem}_model.txt")
 
 
-def save_model(
-    x_label: str,
-    y_label: str,
-    path: Path,
-    theta0: float,
-    theta1: float,
-    extra: Dict[str, float],
-) -> None:
+def save_model(d: Dict) -> None:
+    """
+    Generates a model file at the specified path containing the model parameters
+    and additional metrics.
+    Mandatory file for the second step prectict.py script.
+    """
     try:
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(f"x_label={x_label}\n")
-            f.write(f"y_label={y_label}\n")
-            f.write(f"theta0={theta0}\n")
-            f.write(f"theta1={theta1}\n")
-            for k, v in extra.items():
+        with open(d["out_path"], "w", encoding="utf-8") as f:
+            f.write(f"x_label={d['x_label']}\n")
+            f.write(f"y_label={d['y_label']}\n")
+            f.write(f"theta0={d['theta0']}\n")
+            f.write(f"theta1={d['theta1']}\n")
+            for k, v in d['extra'].items():
                 f.write(f"{k}={v}\n")
+            print(f"Model saved to: {d["out_path"].resolve()}")
     except OSError as e:
-        raise SystemExit(f"Error: failed to write model file '{path}': {e}")
+        raise SystemExit(f"Error: failed to write model file: {e}")
 
 
 def parsing_cli_args() -> argparse.Namespace:
+    """Parses and validates command line arguments."""
     parser = argparse.ArgumentParser(
         description="Train a linear regression model on a CSV file."
     )
@@ -198,6 +208,11 @@ def parsing_cli_args() -> argparse.Namespace:
 
 
 def main() -> None | FuncAnimation:
+    """
+    Main function to execute the training process.
+    Reads data, standardizes it, performs gradient descent,
+    saves the model, and optionally shows bonus animations.
+    """
     args = parsing_cli_args()
     csv_path: Path = args.file
     bonus: bool = args.bonus
@@ -207,13 +222,13 @@ def main() -> None | FuncAnimation:
     print(f"Bonus mode: {'ON' if bonus else 'OFF'}")
 
     x_raw, y_raw, x_label, y_label = read_csv_strict(csv_path)
-    m = x_raw.size
-    print(f"Loaded {m} rows.")
+    print(f"Loaded {x_raw.size} rows.")
 
     x_stand, mean_x, std_x = zscore(x_raw)
     y_stand, mean_y, std_y = zscore(y_raw)
     print(
-        f"Standardization: mean_x={mean_x:.6f}, sigma_x={std_x:.6f} | mean_y={mean_y:.6f}, sigma_y={std_y:.6f}"
+        f"Standardization: mean_x={mean_x:.6f}, sigma_x={std_x:.6f}"
+        f"mean_y={mean_y:.6f}, sigma_y={std_y:.6f}"
     )
 
     alpha = 0.01
@@ -236,10 +251,16 @@ def main() -> None | FuncAnimation:
     print(f"Final (raw) parameters: theta0={theta0_raw:.10f}, theta1={theta1_raw:.10f}")
     print(f"Final raw cost (MSE): {cost_raw_seq[-1]:.10f}")
 
-    extra = metrics_raw(x_raw, y_raw, theta1_raw, theta0_raw)
-    out_path = model_out_path(csv_path)
-    save_model(x_label, y_label, out_path, theta0_raw, theta1_raw, extra)
-    print(f"Model saved to: {out_path.resolve()}")
+    save_model(
+        {
+            "x_label": x_label,
+            "y_label": y_label,
+            "out_path": model_out_path(csv_path),
+            "theta0": theta0_raw,
+            "theta1": theta1_raw,
+            "extra": metrics_raw(x_raw, y_raw, theta1_raw, theta0_raw)
+        }
+    )
 
     print("Model performance metrics available in the model file: model.txt")
 
@@ -251,7 +272,7 @@ def main() -> None | FuncAnimation:
 
     if bonus:
         print("Showing synchronized bonus animations… (will play once)")
-        animation = TrainAnimation(
+        TrainAnimation(
             x_raw,
             y_raw,
             x_stand,
@@ -265,8 +286,7 @@ def main() -> None | FuncAnimation:
             x_label,
             y_label,
             dalton_type=dalton_type,
-        )
-        animation.run()
+        ).run()
     else:
         print("Bonus mode is off. To enable, run with the --bonus flag:")
         print("\n\t./run.sh train --bonus\n")

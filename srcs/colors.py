@@ -1,4 +1,9 @@
+"""
+Adaptative colors palette for dalton modes.
+"""
+
 from typing import Dict, Tuple
+
 
 BASE_PALETTE: Dict[str, Tuple[float, float, float]] = {
     "name": "base",
